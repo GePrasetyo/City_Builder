@@ -72,6 +72,9 @@ crashlytics-build.properties
 /[Aa]ssets/[Ss]treamingAssets/aa.meta
 /[Aa]ssets/[Ss]treamingAssets/aa/*
 
+# Plugin Assets
+/[Aa]ssets/SoftLeitner/*
+
 # IL2CPP build artifacts should be ignored
 *BackUpThisFolder_ButDontShipItWithYourGame
 
