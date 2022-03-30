@@ -74,6 +74,7 @@ crashlytics-build.properties
 
 # Plugin Assets
 /[Aa]ssets/SoftLeitner/*
+/[Aa]ssets/TriLib/*
 
 # IL2CPP build artifacts should be ignored
 *BackUpThisFolder_ButDontShipItWithYourGame
