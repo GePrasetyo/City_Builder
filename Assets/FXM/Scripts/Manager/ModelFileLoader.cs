@@ -1,4 +1,5 @@
 using TriLibCore.General;
+using CityBuilderCore;
 using TriLibCore;
 using UnityEngine;
 using TriLibCore.Extensions;
@@ -10,22 +11,25 @@ public class ModelFileLoader : MonoBehaviour
     /// The last loaded GameObject.
     /// </summary>
     private GameObject _loadedGameObject;
+    [SerializeField] private GameObject panelLoadObject;
+    [SerializeField] private ToolsActivator tools;
 
     /// <summary>
     /// The load Model Button.
     /// </summary>
-    [SerializeField]
-    private Button _loadModelButton;
+    [SerializeField] private Button _loadModelButton;
+    [SerializeField] private Button _openPanel;
 
     /// <summary>
     /// The progress indicator Text;
     /// </summary>
-    [SerializeField]
-    private Text _progressText;
+    [SerializeField] private Text _progressText;
 
     private void Start() {
         _loadModelButton.onClick.AddListener(LoadModel);
-    }
+
+        _openPanel.onClick.AddListener(() => panelLoadObject.SetActive(!panelLoadObject.activeInHierarchy));
+    }    
 
     /// <summary>
     /// Creates the AssetLoaderOptions instance and displays the Model file-picker.
@@ -92,7 +96,8 @@ public class ModelFileLoader : MonoBehaviour
         }
         _loadedGameObject = assetLoaderContext.RootGameObject;
         if (_loadedGameObject != null) {
-            Camera.main.FitToBounds(assetLoaderContext.RootGameObject, 2f);
+            
+            tools.SetToolActive(true);
         }
     }
 }
