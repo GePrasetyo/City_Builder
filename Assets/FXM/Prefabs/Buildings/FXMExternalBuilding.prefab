@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 3420011361270626483}
   - component: {fileID: 9187701827507974711}
+  - component: {fileID: 7777159625226974516}
   m_Layer: 0
   m_Name: FXMExternalBuilding
   m_TagString: Untagged
@@ -45,8 +46,24 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 77c1be50e0b4e8f4a817209d646c99d7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Info: {fileID: 11400000, guid: e93abeab0a6b3684086cbcb6cc128a28, type: 2}
+  Info: {fileID: 11400000, guid: b56c1c4f96bab884d84d1963bb54c54a, type: 2}
   Pivot: {fileID: 1707162513302347695}
+--- !u!114 &7777159625226974516
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 790155606450815151}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a04742bdeb858fa4194f3eb7a7f5a3d1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  foundation: {fileID: 6726619130092686219}
+  pivot: {fileID: 1707162513302347695}
+  buildingComp: {fileID: 9187701827507974711}
+  cache: {fileID: 11400000, guid: 24e6759a068d2d0489148798eaf0fde8, type: 2}
 --- !u!1 &6271658106874606882
 GameObject:
   m_ObjectHideFlags: 0
@@ -143,6 +160,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Foundation
+      objectReference: {fileID: 0}
+    - target: {fileID: 9013831947842364262, guid: dfd10483df15946499ff63e5ac8ad0cb,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: dfd10483df15946499ff63e5ac8ad0cb, type: 3}

@@ -7,12 +7,15 @@ using UnityEngine.UI;
 
 public class ModelFileLoader : MonoBehaviour
 {
+    public static ModelFileLoader instance;
+
     /// <summary>
     /// The last loaded GameObject.
     /// </summary>
-    private GameObject _loadedGameObject;
+    public GameObject _loadedGameObject;
     [SerializeField] private GameObject panelLoadObject;
     [SerializeField] private ToolsActivator tools;
+    [SerializeField] private BuildingBuilder builder;
 
     /// <summary>
     /// The load Model Button.
@@ -24,6 +27,11 @@ public class ModelFileLoader : MonoBehaviour
     /// The progress indicator Text;
     /// </summary>
     [SerializeField] private Text _progressText;
+    [SerializeField] private InputField xSize, ySize;
+
+    private void Awake() {
+        instance = this;
+    }
 
     private void Start() {
         _loadModelButton.onClick.AddListener(LoadModel);
@@ -38,6 +46,11 @@ public class ModelFileLoader : MonoBehaviour
     /// You can create the AssetLoaderOptions by right clicking on the Assets Explorer and selecting "TriLib->Create->AssetLoaderOptions->Pre-Built AssetLoaderOptions".
     /// </remarks>
     public void LoadModel() {
+        if (xSize.text == "" || ySize.text == "" || xSize.text == "0" || ySize.text == "0")
+            return;
+
+        panelLoadObject.gameObject.SetActive(false);
+
         var assetLoaderOptions = AssetLoader.CreateDefaultLoaderOptions();
         var assetLoaderFilePicker = AssetLoaderFilePicker.Create();
         assetLoaderFilePicker.LoadModelFromFilePickerAsync("Select a Model file", OnLoad, OnMaterialsLoad, OnProgress, OnBeginLoad, OnError, null, assetLoaderOptions);
@@ -91,12 +104,11 @@ public class ModelFileLoader : MonoBehaviour
     /// <remarks>The loaded GameObject is available on the assetLoaderContext.RootGameObject field.</remarks>
     /// <param name="assetLoaderContext">The context used to load the Model.</param>
     private void OnLoad(AssetLoaderContext assetLoaderContext) {
-        if (_loadedGameObject != null) {
-            Destroy(_loadedGameObject);
-        }
         _loadedGameObject = assetLoaderContext.RootGameObject;
         if (_loadedGameObject != null) {
-            
+
+            //cacheBuilding.cachedObject = _loadedGameObject;
+            builder.BuildingInfo.Size = new Vector2Int(int.Parse(xSize.text), int.Parse(ySize.text));
             tools.SetToolActive(true);
         }
     }
