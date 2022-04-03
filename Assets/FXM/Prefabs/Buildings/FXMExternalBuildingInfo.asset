@@ -10,19 +10,21 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 11f98b364e13cc940a28c59bb55693cc, type: 3}
-  m_Name: FXMNormalHouseInfo
+  m_Name: FXMExternalBuildingInfo
   m_EditorClassIdentifier: 
-  Key: NH
+  Key: FXMEB
   Name: Normal House
   Description: 
   Size: {x: 2, y: 2}
   IsDestructible: 0
   IsWalkable: 0
-  Prefab: {fileID: 0}
-  Ghost: {fileID: 0}
+  Prefab: {fileID: 9187701827507974711, guid: 8c325a5195cfe7d4d88a9be99b5644a3, type: 3}
+  Ghost: {fileID: 790155606450815151, guid: 8c325a5195cfe7d4d88a9be99b5644a3, type: 3}
   AccessType: 0
   AccessPoint: {x: 0, y: 0}
-  Cost: []
+  Cost:
+  - Item: {fileID: 11400000, guid: 66d7c05d0410fb340a18c097d9f96e9a, type: 2}
+    Quantity: 0
   BuildingRequirements: []
   RoadRequirements: []
   Level:
