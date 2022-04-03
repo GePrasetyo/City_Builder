@@ -10,6 +10,7 @@ namespace CityBuilderCore
 {
     /// <summary>
     /// 3. Able to rotate, scale, translate these items in the scene 
+    /// 2. Click object (road, building, crowd) to zoom/focus on ( hide/translucents others )
     /// </summary>
     public class FeatureThree : BaseTool
     {
@@ -21,7 +22,13 @@ namespace CityBuilderCore
 
         private IHighlightManager _highlighting;
 
+        public Transform MainCameraPivot;
+
+        public Material materialGhost;
+
+
         [Header("UI")]
+        [SerializeField] private Transform canvasUI;
         [SerializeField] private GameObject toolMaseter;
         [SerializeField] private TMP_Text objectName;
         [SerializeField] private Button buttonClose;
@@ -66,17 +73,27 @@ namespace CityBuilderCore
 
         private void Update()
         {
-            if (Input.GetMouseButtonUp(0))
+            if (Input.GetMouseButtonDown(0))
             {
                 var mousePosition = _mouseInput.GetMouseGridPosition();
+                Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+                Plane plane = new Plane(Vector3.up, 0);
+                Vector3 worldPosition = Vector3.zero;
+                float distance;
+                if (plane.Raycast(ray, out distance))
+                {
+                    worldPosition = ray.GetPoint(distance);
 
+
+                }
                 var walkerObject = Physics.RaycastAll(_mouseInput.GetRay()).Select(h => h.transform.gameObject).FirstOrDefault(g => g.CompareTag("Walker"));
                 if (walkerObject)
                 {
                     var walker = walkerObject.GetComponent<Walker>();
                     if (walker)
                     {
-                        Debug.Log(walker.name);
+
+                        StartCoroutine(Lerp(MainCameraPivot, worldPosition, 1f));
                         return;
                     }
                 }
@@ -85,15 +102,14 @@ namespace CityBuilderCore
                 if (_building != null)
                 {
 
-                    Plane plane = new Plane(Vector3.up, 0);
-                    Vector3 worldPosition = Vector3.zero;
-                    float distance;
-                    Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-                    if (plane.Raycast(ray, out distance))
-                    {
-                        worldPosition = ray.GetPoint(distance);
-                        toolMaseter.transform.position = worldPosition;
-                    }
+
+
+                    toolMaseter.transform.position = worldPosition;
+
+                    RecenterCanvasUI();
+                    ResetAllTranslucent();
+                    StartCoroutine(Lerp(MainCameraPivot, worldPosition, 1f, SetAllToTranslucent));
+
                     objectName.text = _building.GetName();
                     _target = _building.Root.gameObject;
                     toolMaseter.SetActive(true);
@@ -101,7 +117,66 @@ namespace CityBuilderCore
                 }
             }
 
-            if (_target == null) toolMaseter.SetActive(false);
+            if (_target == null || Input.GetMouseButtonDown(1))
+            {
+                ResetAllTranslucent();
+                toolMaseter.SetActive(false);
+            }
+        }
+
+        IEnumerator Lerp(Transform _target, Vector3 _end, float _duration, System.Action _postAction = null)
+        {
+            float timeElapsed = 0;
+            while (timeElapsed < _duration)
+            {
+                _target.position = Vector3.Lerp(_target.position, _end, timeElapsed / _duration);
+                timeElapsed += Time.deltaTime;
+                yield return null;
+            }
+            _target.position = _end;
+            if (_postAction != null) _postAction();
+
+        }
+
+        Dictionary<GameObject, Translucent> dd = new Dictionary<GameObject, Translucent>();
+        private void SetAllToTranslucent()
+        {
+            Building[] buildings = FindObjectsOfType<Building>();
+            dd.Clear();
+            foreach (var b in buildings)
+            {
+                dd.Add(b.transform.GetChild(0).gameObject, new Translucent(b.transform.GetChild(0).gameObject, materialGhost));
+                dd[b.transform.GetChild(0).gameObject].ChangeMaterials();
+            }
+            Untranslucent(_target);
+        }
+
+        private void Untranslucent(GameObject _object)
+        {
+            foreach (var b in dd)
+            {
+                if (b.Key.Equals(_object.transform.GetChild(0).gameObject))
+                {
+                    b.Value.Reset();
+                    break;
+                }
+            }
+        }
+
+        private void ResetAllTranslucent()
+        {
+            if (dd.Count > 0)
+            {
+                foreach (var b in dd)
+                {
+                    b.Value.Reset();
+                }
+            }
+        }
+
+        private void RecenterCanvasUI()
+        {
+            canvasUI.localRotation = MainCameraPivot.rotation;
         }
 
         private void OnActivateFeature(ActiveFeature _feature)

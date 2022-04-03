@@ -51,6 +51,9 @@ MonoBehaviour:
   Applied:
     m_PersistentCalls:
       m_Calls: []
+  MainCameraPivot: {fileID: 0}
+  materialGhost: {fileID: 2100000, guid: e46223bc15667e841bec36b1bcbb27b3, type: 2}
+  canvasUI: {fileID: 0}
   toolMaseter: {fileID: 0}
   objectName: {fileID: 0}
   buttonClose: {fileID: 0}
