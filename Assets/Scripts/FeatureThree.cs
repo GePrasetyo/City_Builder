@@ -124,6 +124,8 @@ namespace CityBuilderCore
             }
         }
 
+        #region translucent and focus
+
         IEnumerator Lerp(Transform _target, Vector3 _end, float _duration, System.Action _postAction = null)
         {
             float timeElapsed = 0;
@@ -179,6 +181,8 @@ namespace CityBuilderCore
             canvasUI.localRotation = MainCameraPivot.rotation;
         }
 
+        #endregion
+
         private void OnActivateFeature(ActiveFeature _feature)
         {
             bool _isRotate = _feature.Equals(ActiveFeature.Rotate);
@@ -212,13 +216,14 @@ namespace CityBuilderCore
 
         private void OnScalePlus()
         {
-            _target.transform.localScale += new Vector3(1, 1, 1);
+            if (_target.transform.GetChild(0).localScale.x < 1)
+                _target.transform.GetChild(0).localScale += new Vector3(0.1f, 0.1f, 0.1f);
         }
 
         private void OnScaleMinus()
         {
-            if (_target.transform.localScale.x > 1)
-                _target.transform.localScale += new Vector3(-1, -1, -1);
+            if (_target.transform.GetChild(0).localScale.x > .5f)
+                _target.transform.GetChild(0).localScale += new Vector3(-0.1f, -0.1f, -0.1f);
         }
 
 
