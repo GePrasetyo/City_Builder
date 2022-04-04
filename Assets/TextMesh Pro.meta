@@ -1,5 +1,9 @@
 fileFormatVersion: 2
+<<<<<<< HEAD
 guid: 09f90c41fd3b02d4e8f3f043e3416013
+=======
+guid: f54d1bd14bd3ca042bd867b519fee8cc
+>>>>>>> bimaswara/additionalFeature
 folderAsset: yes
 DefaultImporter:
   externalObjects: {}

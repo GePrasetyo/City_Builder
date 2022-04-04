@@ -1,0 +1,91 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &3174062857307293782
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 3174062857307293780}
+  - component: {fileID: 3174062857307293783}
+  - component: {fileID: 3174062857307293781}
+  m_Layer: 0
+  m_Name: Test
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &3174062857307293780
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3174062857307293782}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 1106, y: 60, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &3174062857307293783
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3174062857307293782}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d779c0df33f3a6d4698f55997b6064a0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  View: {fileID: 0}
+  Activating:
+    m_PersistentCalls:
+      m_Calls: []
+  Applied:
+    m_PersistentCalls:
+      m_Calls: []
+  MainCameraPivot: {fileID: 0}
+  materialGhost: {fileID: 2100000, guid: e46223bc15667e841bec36b1bcbb27b3, type: 2}
+  canvasUI: {fileID: 0}
+  toolMaseter: {fileID: 0}
+  objectName: {fileID: 0}
+  buttonClose: {fileID: 0}
+  buttonRotate: {fileID: 0}
+  buttonRotatePlus: {fileID: 0}
+  buttonRotateMinus: {fileID: 0}
+  buttonScale: {fileID: 0}
+  buttonScalePlus: {fileID: 0}
+  buttonScaleMinus: {fileID: 0}
+  buttonTranslate: {fileID: 0}
+  buttonTranslateXPlus: {fileID: 0}
+  buttonTranslateXMinus: {fileID: 0}
+  buttonTranslateZPlus: {fileID: 0}
+  buttonTranslateZMinus: {fileID: 0}
+--- !u!114 &3174062857307293781
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3174062857307293782}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2691f9789f6ef1d41a856c536df57d50, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  buttonSave: {fileID: 0}
+  inputFieldSave: {fileID: 0}
+  buttonLoad: {fileID: 0}
+  buttonLoadCloseList: {fileID: 0}
+  gameObjectLoadFileMenu: {fileID: 0}
+  transformLoadFileContainer: {fileID: 0}
+  gameObjectLoadFileModel: {fileID: 0}
+  toggleAutoSave: {fileID: 0}
+  autoSavePeriode: 1800
