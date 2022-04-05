@@ -19,9 +19,9 @@ namespace CityBuilderCore
         private IMouseInput _mouseInput;
         private IBuilding _building { get; set; }
         private GameObject _target;
-
-        private IHighlightManager _highlighting;
-
+        private bool _isBuild = false;
+        private BuildingBuilder _buildingBuilder;
+        private BuildingRotation _buildingRotation;
         public Transform MainCameraPivot;
 
         public Material materialGhost;
@@ -49,7 +49,6 @@ namespace CityBuilderCore
         {
             toolMaseter.SetActive(false);
             _mouseInput = Dependencies.Get<IMouseInput>();
-            _highlighting = Dependencies.Get<IHighlightManager>();
             buttonClose.onClick.AddListener(() => toolMaseter.SetActive(false));
 
             //rotation
@@ -112,6 +111,7 @@ namespace CityBuilderCore
 
                     objectName.text = _building.GetName();
                     _target = _building.Root.gameObject;
+                    _buildingRotation = _target.GetComponent<Building>().Rotation;
                     toolMaseter.SetActive(true);
                     return;
                 }
@@ -121,6 +121,12 @@ namespace CityBuilderCore
             {
                 ResetAllTranslucent();
                 toolMaseter.SetActive(false);
+            }
+
+            if (_isBuild && Input.GetMouseButtonDown(1))
+            {
+                _buildingBuilder.DeactivateTool();
+                _isBuild = false;
             }
         }
 
@@ -192,25 +198,46 @@ namespace CityBuilderCore
             buttonRotatePlus.gameObject.SetActive(_isRotate);
             buttonRotateMinus.gameObject.SetActive(_isRotate);
 
-            _highlighting.Clear();
-            // _highlighting.Highlight(_rotation.RotateBuildingPoint(mousePoint, BuildingInfo.AccessPoint, BuildingInfo.Size), HighlightType.Info);
-
             buttonScalePlus.gameObject.SetActive(_isScale);
             buttonScaleMinus.gameObject.SetActive(_isScale);
 
-            buttonTranslateXPlus.gameObject.SetActive(_isTranslate);
-            buttonTranslateXMinus.gameObject.SetActive(_isTranslate);
-            buttonTranslateZPlus.gameObject.SetActive(_isTranslate);
-            buttonTranslateZMinus.gameObject.SetActive(_isTranslate);
+            if (_feature.Equals(ActiveFeature.Translate))
+            {
+                Building _dBuilding = _target.GetComponent<Building>();
+                BuildingBuilder[] bb = FindObjectsOfType<BuildingBuilder>();
+                foreach (var b in bb)
+                {
+                    if (b.BuildingInfo.Equals(_dBuilding.Info))
+                    {
+                        _buildingBuilder = b;
+                        _isBuild = true;
+                        b.ActivateTool();
+                        break;
+                    }
+                }
+                _dBuilding.Terminate();
+            }
+            // buttonTranslateXPlus.gameObject.SetActive(_isTranslate);
+            // buttonTranslateXMinus.gameObject.SetActive(_isTranslate);
+            // buttonTranslateZPlus.gameObject.SetActive(_isTranslate);
+            // buttonTranslateZMinus.gameObject.SetActive(_isTranslate);
         }
+
+        //need to change BuildingRotation "set" to public
         private void OnRotatePlus()
         {
             _target.transform.GetChild(0).localRotation = Quaternion.AngleAxis(90, Vector3.up) * _target.transform.GetChild(0).localRotation;
+
+            _buildingRotation.State++;
+            if (_buildingRotation.State > 3) _buildingRotation.State = 0;
         }
 
         private void OnRotateMinus()
         {
             _target.transform.GetChild(0).localRotation = Quaternion.AngleAxis(-90, Vector3.up) * _target.transform.GetChild(0).localRotation;
+
+            _buildingRotation.State--;
+            if (_buildingRotation.State < 0) _buildingRotation.State = 3;
         }
 
 
