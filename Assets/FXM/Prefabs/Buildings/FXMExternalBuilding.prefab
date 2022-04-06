@@ -63,7 +63,6 @@ MonoBehaviour:
   foundation: {fileID: 6726619130092686219}
   pivot: {fileID: 1707162513302347695}
   buildingComp: {fileID: 9187701827507974711}
-  cache: {fileID: 11400000, guid: 24e6759a068d2d0489148798eaf0fde8, type: 2}
 --- !u!1 &6271658106874606882
 GameObject:
   m_ObjectHideFlags: 0
@@ -73,7 +72,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1707162513302347695}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Pivot
   m_TagString: Untagged
   m_Icon: {fileID: 0}

@@ -100,9 +100,6 @@ namespace CityBuilderCore
                 _building = Dependencies.Get<IBuildingManager>().GetBuilding(mousePosition).FirstOrDefault();
                 if (_building != null)
                 {
-
-
-
                     toolMaseter.transform.position = worldPosition;
 
                     RecenterCanvasUI();
