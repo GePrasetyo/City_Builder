@@ -12,7 +12,6 @@ namespace CityBuilderCore
 {
     public class CustomSaveLoad : MonoBehaviour
     {
-
         [SerializeField] private Button buttonSave;
         [SerializeField] private TMP_InputField inputFieldSave;
         [SerializeField] private Button buttonLoad;
@@ -20,6 +19,8 @@ namespace CityBuilderCore
         [SerializeField] private GameObject gameObjectLoadFileMenu;
         [SerializeField] private Transform transformLoadFileContainer;
         [SerializeField] private GameObject gameObjectLoadFileModel;
+        [SerializeField] private GameObject savingTextNotif;
+
         [SerializeField] private Toggle toggleAutoSave;
 
 
@@ -100,8 +101,15 @@ namespace CityBuilderCore
                 savedFile.Add(_saveFileName);
 
 
-            inputFieldSave.text = "";
+            //inputFieldSave.text = "";
+            savingTextNotif.SetActive(true);
+            Invoke("HideSavingNotif", 2f);
             SaveDataList();
+        }
+
+        void HideSavingNotif() {
+            savingTextNotif.SetActive(false);
+
         }
 
         /// <summary>
@@ -146,10 +154,12 @@ namespace CityBuilderCore
         /// <param name="_data">data title</param>
         private void Delete(string _data)
         {
-            foreach (var d in savedFile)
-            {
-                if (_data.Equals(d)) savedFile.Remove(d);
-            }
+            savedFile.Remove(_data);
+
+            //foreach (var d in savedFile)
+            //{
+            //    if (_data.Equals(d)) savedFile.Remove(d);
+            //}
             SaveDataList();
             OnCloseLoadMenu();
         }
