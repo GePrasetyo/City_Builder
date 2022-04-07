@@ -49,7 +49,7 @@ namespace CityBuilderCore
                     canvasUI.localRotation = MainCameraPivot.rotation;
                     StartCoroutine(Lerp(MainCameraPivot, worldPosition, 1f));
 
-                    FadeObstructionsManager.Instance.RegisterShouldBeVisible(_building.Root.gameObject);
+                    //FadeObstructionsManager.Instance.RegisterShouldBeVisible(_building.Root.gameObject);
                     return;
                 }
             }
