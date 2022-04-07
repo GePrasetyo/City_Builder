@@ -27,7 +27,7 @@ public class FadeObstructionsManager : MonoBehaviour
         void OnDestroy()
         {
             FadeObstructionsManager.Instance.RemoveFadingObject(this.gameObject);
-            FadeObstructionsManager.Instance.UnRegisterShouldBeVisible(this.gameObject);
+            //FadeObstructionsManager.Instance.UnRegisterShouldBeVisible(this.gameObject);
         }
     }
 
@@ -67,7 +67,7 @@ public class FadeObstructionsManager : MonoBehaviour
 
 
     //
-    List<MeshRenderer> objectsInWay = new List<MeshRenderer>();
+    List<GameObject> objectsInWay = new List<GameObject>();
 
     // Check to see if a game object is faded
     public bool IsHidden(GameObject go)
@@ -83,7 +83,7 @@ public class FadeObstructionsManager : MonoBehaviour
         shouldBeVisible.AddComponent<NotifyFadeSystem>();
     }
 
-    public void UnRegisterShouldBeVisible(GameObject shouldBeVisible)
+    public void UnRegisterShouldBeVisible()
     {
         ShouldBeVisibleObjects = nullObject;
     }
@@ -129,8 +129,8 @@ public class FadeObstructionsManager : MonoBehaviour
                 if (ShouldBeVisibleObjects == parentC.gameObject)
                     continue;
 
-                var objs =  parentC.GetChild(0).GetComponentsInChildren<MeshRenderer>();
-                objectsInWay.AddRange(objs);
+                var objs =  parentC.GetChild(0);
+                objectsInWay.Add(objs.gameObject);
             }
             //}
         }
@@ -139,22 +139,22 @@ public class FadeObstructionsManager : MonoBehaviour
         FadeObstructions(objectsInWay);
     }
 
-    private void FadeObstructions(List<MeshRenderer> objectsInWay)
+    private void FadeObstructions(List<GameObject> objectsInWay)
     {        
         foreach (var go in objectsInWay)
         {
             // If the object is already hidden
-            FadeObject hiddenObject = HiddenObjects.FirstOrDefault(x => x.GameObject == go.gameObject);
+            FadeObject hiddenObject = HiddenObjects.FirstOrDefault(x => x.GameObject == go);
             if (hiddenObject == null)
             {
                // Get the object fade options
-                FadeObjectOptions fadeObjectOptions = go.gameObject.GetComponent<FadeObjectOptions>();
+                FadeObjectOptions fadeObjectOptions = go.GetComponent<FadeObjectOptions>();
                 
                 // If the maximum fade is set to 1 then this object won't be hidden, so skip it
                 if (fadeObjectOptions != null && fadeObjectOptions.OverrideFinalAlpha && fadeObjectOptions.FinalAlpha == 1)
                     continue;
 
-                hiddenObject = new FadeObject { GameObject = go.gameObject, TransparencyLevel = 1.0f };
+                hiddenObject = new FadeObject { GameObject = go, TransparencyLevel = 1.0f };
                 
                 //
                 hiddenObject.Options = fadeObjectOptions;
@@ -168,50 +168,61 @@ public class FadeObstructionsManager : MonoBehaviour
         // Unhide the objects that are not hidden anymore
         HiddenObjects.RemoveAll(x =>
         {
-            float fadeOutSeconds = x.Options != null && x.Options.OverrideFadeOutSeconds ? x.Options.FadeOutSeconds : FadeOutSeconds;
-            float fadeInSeconds = x.Options != null && x.Options.OverrideFadeInSeconds ? x.Options.FadeInSeconds : FadeInSeconds;
+            //float fadeOutSeconds = x.Options != null && x.Options.OverrideFadeOutSeconds ? x.Options.FadeOutSeconds : FadeOutSeconds;
+            //float fadeInSeconds = x.Options != null && x.Options.OverrideFadeInSeconds ? x.Options.FadeInSeconds : FadeInSeconds;
 
             foreach (var go in objectsInWay)
             {
                 if (go.gameObject == x.GameObject)
                 {
+                    if (x.GameObject.activeInHierarchy)
+                        x.GameObject.SetActive(false);
+
                     // Change the transparency of already hidden items
-                    float maximumFade = x.Options != null && x.Options.OverrideFinalAlpha ? x.Options.FinalAlpha : FinalAlpha;
-                    if (x.TransparencyLevel > maximumFade)
-                    {
-                        x.TransparencyLevel -= Time.deltaTime * (1.0f / fadeOutSeconds);
+                    //float maximumFade = x.Options != null && x.Options.OverrideFinalAlpha ? x.Options.FinalAlpha : FinalAlpha;
+                    //if (x.TransparencyLevel > maximumFade)
+                    //{
+                    //    x.TransparencyLevel -= Time.deltaTime * (1.0f / fadeOutSeconds);
 
-                        if (x.TransparencyLevel <= maximumFade)
-                            x.TransparencyLevel = maximumFade;
+                    //    if (x.TransparencyLevel <= maximumFade)
+                    //        x.TransparencyLevel = maximumFade;
 
-                        foreach (Material m in x.GameObject.GetComponent<Renderer>().materials)
-                            m.color = new Color(m.color.r, m.color.g, m.color.b, x.TransparencyLevel);
+                    //    foreach (Material m in x.GameObject.GetComponent<Renderer>().materials)
+                    //        m.color = new Color(m.color.r, m.color.g, m.color.b, x.TransparencyLevel);
 
-                        // Reached the intended level of fade, disable the renderer if the alpha is 0
-                        if (x.TransparencyLevel == maximumFade && x.TransparencyLevel == 0)
-                            x.GameObject.GetComponent<Renderer>().enabled = false;
-                    }
+                    //    // Reached the intended level of fade, disable the renderer if the alpha is 0
+                    //    if (x.TransparencyLevel == maximumFade && x.TransparencyLevel == 0)
+                    //        x.GameObject.GetComponent<Renderer>().enabled = false;
+                    //}
 
                     return false;
                 }
             }
 
-            // Bring the object up to full transparency before removing it from the fade list 
-            if (x.TransparencyLevel < 1.0f)
-            {
-                // Renable the renderer if the transparency level was 0
-                if (x.TransparencyLevel == 0)
-                    x.GameObject.GetComponent<Renderer>().enabled = true;
 
-                x.TransparencyLevel += Time.deltaTime * (1.0f / fadeInSeconds);
-                if (x.TransparencyLevel > 1)
-                    x.TransparencyLevel = 1;
-
-                foreach (Material m in x.GameObject.GetComponent<Renderer>().materials)
-                    m.color = new Color(m.color.r, m.color.g, m.color.b, x.TransparencyLevel);
-
+            if (!x.GameObject.activeInHierarchy) {
+                x.GameObject.SetActive(true);
                 return false;
+
+
             }
+
+            //// Bring the object up to full transparency before removing it from the fade list 
+            //if (x.TransparencyLevel < 1.0f)
+            //{
+            //    // Renable the renderer if the transparency level was 0
+            //    if (x.TransparencyLevel == 0)
+            //        x.GameObject.GetComponent<Renderer>().enabled = true;
+
+            //    x.TransparencyLevel += Time.deltaTime * (1.0f / fadeInSeconds);
+            //    if (x.TransparencyLevel > 1)
+            //        x.TransparencyLevel = 1;
+
+            //    foreach (Material m in x.GameObject.GetComponent<Renderer>().materials)
+            //        m.color = new Color(m.color.r, m.color.g, m.color.b, x.TransparencyLevel);
+
+            //    return false;
+            //}
 
             // Remove the FadedObject monobehaviour
             Destroy(x.GameObject.GetComponent<NotifyFadeSystem>());

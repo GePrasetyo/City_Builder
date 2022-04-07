@@ -110,6 +110,9 @@ namespace CityBuilderCore
                     _target = _building.Root.gameObject;
                     _buildingRotation = _target.GetComponent<Building>().Rotation;
                     toolMaseter.SetActive(true);
+
+                    Debug.Log("Target : " + _building.Root.gameObject.name);
+                    FadeObstructionsManager.Instance.RegisterShouldBeVisible(_building.Root.gameObject);
                     return;
                 }
             }
@@ -170,6 +173,8 @@ namespace CityBuilderCore
 
         private void ResetAllTranslucent()
         {
+            FadeObstructionsManager.Instance.UnRegisterShouldBeVisible();
+
             if (dd.Count > 0)
             {
                 foreach (var b in dd)

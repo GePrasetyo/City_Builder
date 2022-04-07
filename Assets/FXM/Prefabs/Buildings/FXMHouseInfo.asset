@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 11f98b364e13cc940a28c59bb55693cc, type: 3}
   m_Name: FXMHouseInfo
   m_EditorClassIdentifier: 
-  Key: HOS
+  Key: FHOS
   Name: House
   Description: decent living
   Size: {x: 3, y: 3}

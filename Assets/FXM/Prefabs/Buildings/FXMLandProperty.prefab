@@ -1941,6 +1941,7 @@ GameObject:
   - component: {fileID: 2858427974924520254}
   - component: {fileID: 1047742363913633486}
   - component: {fileID: 5486945665984791592}
+  - component: {fileID: 7868672696716753229}
   m_Layer: 8
   m_Name: Foundation
   m_TagString: Untagged
@@ -2027,6 +2028,19 @@ NavMeshObstacle:
   m_CarveOnlyStationary: 1
   m_Center: {x: 0, y: 0, z: 0}
   m_TimeToStationary: 0.5
+--- !u!65 &7868672696716753229
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6995791755173594764}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 1
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 1, y: 2, z: 1}
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &7278796835446621758
 GameObject:
   m_ObjectHideFlags: 0
