@@ -10,7 +10,7 @@ using TMPro;
 
 namespace CityBuilderCore
 {
-    public class FeatureSix : MonoBehaviour
+    public class CustomSaveLoad : MonoBehaviour
     {
 
         [SerializeField] private Button buttonSave;
@@ -39,11 +39,10 @@ namespace CityBuilderCore
         {
             LoadDataList();
 
-
             gameObjectLoadFileMenu.SetActive(false);
             toggleAutoSave.onValueChanged.AddListener(delegate { IsAutoSave(toggleAutoSave.isOn); });
-            buttonSave.onClick.AddListener(() => OnButtonSaveClicked());
-            buttonLoad.onClick.AddListener(() => OnButtonLoadClicked());
+            buttonSave.onClick.AddListener(() => Save());
+            buttonLoad.onClick.AddListener(() => Load());
             buttonLoadCloseList.onClick.AddListener(() => OnCloseLoadMenu());
         }
 
@@ -55,12 +54,16 @@ namespace CityBuilderCore
                 _currentTimeToSave -= Time.deltaTime;
                 if (_currentTimeToSave <= 0)
                 {
-                    OnButtonSaveClicked();
+                    Save();
                     _currentTimeToSave = autoSavePeriode;
                 }
             }
         }
 
+        /// <summary>
+        /// enable/disable auto save feature
+        /// </summary>
+        /// <param name="_status">feature status</param>
         private void IsAutoSave(bool _status)
         {
             if (_status)
@@ -74,7 +77,10 @@ namespace CityBuilderCore
             }
         }
 
-        private void OnButtonSaveClicked()
+        /// <summary>
+        /// save game data with the default storage system of the city builder plugin
+        /// </summary>
+        private void Save()
         {
             if (string.IsNullOrWhiteSpace(inputFieldSave.text)) _saveFileName = "default";
             else _saveFileName = inputFieldSave.text;
@@ -98,7 +104,10 @@ namespace CityBuilderCore
             SaveDataList();
         }
 
-        private void OnButtonLoadClicked()
+        /// <summary>
+        /// Load saved data
+        /// </summary>
+        private void Load()
         {
             if (!_isLoadList)
             {
@@ -111,7 +120,7 @@ namespace CityBuilderCore
                     _text.text = s;
                     ls.transform.localScale = new Vector3(1, 1, 1);
                     ls.GetComponent<Button>().onClick.AddListener(() => OnSelectedSavedFile(s));
-                    ls.transform.GetChild(1).GetComponent<Button>().onClick.AddListener(() => OnDeleteData(s));
+                    ls.transform.GetChild(1).GetComponent<Button>().onClick.AddListener(() => Delete(s));
 
                     ls.SetActive(true);
                     savedGameobject.Add(ls);
@@ -131,7 +140,11 @@ namespace CityBuilderCore
             }
         }
 
-        private void OnDeleteData(string _data)
+        /// <summary>
+        /// delete saved data
+        /// </summary>
+        /// <param name="_data">data title</param>
+        private void Delete(string _data)
         {
             foreach (var d in savedFile)
             {
@@ -141,6 +154,37 @@ namespace CityBuilderCore
             OnCloseLoadMenu();
         }
 
+
+        /// <summary>
+        /// save all game titles saved data
+        /// </summary>
+        private void SaveDataList()
+        {
+            string data = null;
+            foreach (var s in savedFile)
+            {
+                if (string.IsNullOrWhiteSpace(data)) data += s;
+                else data += $",{s}";
+            }
+            PlayerPrefs.SetString($"SAVE_TEMP_LIST", data);
+            PlayerPrefs.Save();
+        }
+
+        /// <summary>
+        /// load all game titles saved data
+        /// </summary>
+        private void LoadDataList()
+        {
+            savedFile = new List<string>();
+            savedFile.Clear();
+            if (!string.IsNullOrWhiteSpace(PlayerPrefs.GetString($"SAVE_TEMP_LIST")))
+            {
+                string[] data = PlayerPrefs.GetString($"SAVE_TEMP_LIST").Split(',');
+                savedFile = data.ToList<string>();
+            }
+        }
+
+        #region UI needs
         private void OnCloseLoadMenu()
         {
             gameObjectLoadFileMenu.SetActive(false);
@@ -159,6 +203,7 @@ namespace CityBuilderCore
             _object.SetActive(_status);
         }
 
+
         private void OnSelectedSavedFile(string _fileName)
         {
             _isLoadList = true;
@@ -172,29 +217,7 @@ namespace CityBuilderCore
             gameObjectLoadFileMenu.SetActive(false);
             buttonLoad.interactable = true;
         }
-
-        private void SaveDataList()
-        {
-            string data = null;
-            foreach (var s in savedFile)
-            {
-                if (string.IsNullOrWhiteSpace(data)) data += s;
-                else data += $",{s}";
-            }
-            PlayerPrefs.SetString($"SAVE_TEMP_LIST", data);
-            PlayerPrefs.Save();
-        }
-
-        private void LoadDataList()
-        {
-            savedFile = new List<string>();
-            savedFile.Clear();
-            if (!string.IsNullOrWhiteSpace(PlayerPrefs.GetString($"SAVE_TEMP_LIST")))
-            {
-                string[] data = PlayerPrefs.GetString($"SAVE_TEMP_LIST").Split(',');
-                savedFile = data.ToList<string>();
-            }
-        }
+        #endregion
 
     }
 
