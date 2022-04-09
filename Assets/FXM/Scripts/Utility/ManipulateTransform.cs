@@ -16,6 +16,7 @@ namespace CityBuilderCore
         private bool _isBuild = false;
         private float maxScaleBuilding = 1.0f, minScaleBuilding = .5f;
         private BuildingBuilder _buildingBuilder;
+        private IEnumerable<Vector2Int> _prevBuildLoc;
         private BuildingRotation _buildingRotation;
         private Vector3 offset = new Vector3(-.4f, 1.0f, 0f);
 
@@ -59,11 +60,22 @@ namespace CityBuilderCore
                 toolMaster.SetActive(false);
             }
 
-            if (_isBuild && Input.GetMouseButtonDown(1))
+            if (_isBuild && Input.GetMouseButtonDown(0))
             {
-                _buildingBuilder.DeactivateTool();
                 _isBuild = false;
             }
+
+            if (Input.GetMouseButtonDown(1))
+            {
+                if (_isBuild)
+                {
+                    _isBuild = false;
+                    TranslateCancel();
+                }
+                else if (_buildingBuilder != null)
+                    _buildingBuilder.DeactivateTool();
+            }
+
         }
 
         public void SelectedBuilding(IBuilding _b, Vector3 worldPosition)
@@ -100,6 +112,7 @@ namespace CityBuilderCore
             if (_feature.Equals(ActiveFeature.Translate))
             {
                 Building _dBuilding = _target.GetComponent<Building>();
+                _prevBuildLoc = _dBuilding.GetPoints();
                 BuildingBuilder[] bb = FindObjectsOfType<BuildingBuilder>();
                 foreach (var b in bb)
                 {
@@ -114,6 +127,30 @@ namespace CityBuilderCore
                 _dBuilding.Terminate();
             }
         }
+
+        #region translate
+
+        public void TranslateCancel()
+        {
+            _isBuild = false;
+            if (_buildingBuilder != null)
+            {
+                _buildingBuilder.DeactivateTool();
+                bool isOk = true;
+                foreach (var point in _prevBuildLoc)
+                {
+                    if (!_buildingBuilder.BuildingInfo.CheckBuildingAvailability(point))
+                        isOk = false;
+                }
+                if (isOk)
+                {
+                    _buildingBuilder.build(_prevBuildLoc);
+                    _buildingBuilder = null;
+                }
+            }
+        }
+
+        #endregion
 
         #region  rotation
 
