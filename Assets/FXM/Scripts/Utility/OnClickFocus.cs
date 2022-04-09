@@ -19,23 +19,19 @@ namespace CityBuilderCore
         }
         private void Update()
         {
-            if (Input.GetMouseButtonDown(0))
-            {
+            if (Input.GetMouseButtonDown(0)) {
                 var mousePosition = _mouseInput.GetMouseGridPosition();
                 Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
                 Plane plane = new Plane(Vector3.up, 0);
                 Vector3 worldPosition = Vector3.zero;
                 float distance;
-                if (plane.Raycast(ray, out distance))
-                {
+                if (plane.Raycast(ray, out distance)) {
                     worldPosition = ray.GetPoint(distance);
                 }
                 var walkerObject = Physics.RaycastAll(_mouseInput.GetRay()).Select(h => h.transform.gameObject).FirstOrDefault(g => g.CompareTag("Walker"));
-                if (walkerObject)
-                {
+                if (walkerObject) {
                     var walker = walkerObject.GetComponent<Walker>();
-                    if (walker)
-                    {
+                    if (walker) {
 
                         StartCoroutine(Lerp(MainCameraPivot, worldPosition, 1f));
                         return;
@@ -43,13 +39,12 @@ namespace CityBuilderCore
                 }
 
                 var _building = Dependencies.Get<IBuildingManager>().GetBuilding(mousePosition).FirstOrDefault();
-                if (_building != null)
-                {
+                if (_building != null) {
                     ManipulateTransform.Instance.SelectedBuilding(_building, worldPosition);
                     canvasUI.localRotation = MainCameraPivot.rotation;
                     StartCoroutine(Lerp(MainCameraPivot, worldPosition, 1f));
 
-                    FadeObstructionsManager.Instance.RegisterShouldBeVisible(_building.Root.gameObject);
+                    //FadeObstructionsManager.Instance.RegisterShouldBeVisible(_building.Root.gameObject);
                     return;
                 }
             }
