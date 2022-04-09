@@ -16,7 +16,7 @@ namespace CityBuilderCore
         private bool _isBuild = false;
         private float maxScaleBuilding = 1.0f, minScaleBuilding = .5f;
         private BuildingBuilder _buildingBuilder;
-        private IEnumerable<Vector2Int> _prevBuildLoc;
+        private List<Vector2Int> _prevBuildLoc = new List<Vector2Int>();
         private BuildingRotation _buildingRotation;
         private Vector3 offset = new Vector3(-.4f, 1.0f, 0f);
 
@@ -112,7 +112,7 @@ namespace CityBuilderCore
             if (_feature.Equals(ActiveFeature.Translate))
             {
                 Building _dBuilding = _target.GetComponent<Building>();
-                _prevBuildLoc = _dBuilding.GetPoints();
+                _prevBuildLoc.Add(_dBuilding.Point);
                 BuildingBuilder[] bb = FindObjectsOfType<BuildingBuilder>();
                 foreach (var b in bb)
                 {
@@ -145,6 +145,7 @@ namespace CityBuilderCore
                 if (isOk)
                 {
                     _buildingBuilder.build(_prevBuildLoc);
+                    _prevBuildLoc.Clear();
                     _buildingBuilder = null;
                 }
             }
