@@ -4,188 +4,186 @@ using System.Linq;
 using UnityEngine;
 using TMPro;
 using UnityEngine.UI;
+using CityBuilderCore;
 
-namespace CityBuilderCore
+public class ManipulateTransform : MonoSingleton<ManipulateTransform>
 {
-    public class ManipulateTransform : MonoSingleton<ManipulateTransform>
+    private enum ActiveFeature { None, Rotate, Scale, Translate }
+    private ActiveFeature activeFeature;
+    public IBuilding _building { get; set; }
+    private GameObject _target;
+    private bool _isBuild = false;
+    private float maxScaleBuilding = 1.0f, minScaleBuilding = .5f;
+    private BuildingBuilder _buildingBuilder;
+    private List<Vector2Int> _prevBuildLoc = new List<Vector2Int>();
+    private BuildingRotation _buildingRotation;
+    private Vector3 offset = new Vector3(-.4f, 1.0f, 0f);
+
+
+    [Header("UI")]
+    [SerializeField] private GameObject toolMaster;
+    [SerializeField] private TMP_Text objectName;
+    [SerializeField] private Button buttonClose;
+    [SerializeField] private Button buttonRotate;
+    [SerializeField] private Button buttonRotatePlus;
+    [SerializeField] private Button buttonRotateMinus;
+
+    [SerializeField] private Button buttonScale;
+    [SerializeField] private Button buttonScalePlus;
+    [SerializeField] private Button buttonScaleMinus;
+
+    [SerializeField] private Button buttonTranslate;
+
+    private void Start()
     {
-        private enum ActiveFeature { None, Rotate, Scale, Translate }
-        private ActiveFeature activeFeature;
-        public IBuilding _building { get; set; }
-        private GameObject _target;
-        private bool _isBuild = false;
-        private float maxScaleBuilding = 1.0f, minScaleBuilding = .5f;
-        private BuildingBuilder _buildingBuilder;
-        private List<Vector2Int> _prevBuildLoc = new List<Vector2Int>();
-        private BuildingRotation _buildingRotation;
-        private Vector3 offset = new Vector3(-.4f, 1.0f, 0f);
+        toolMaster.SetActive(false);
+        buttonClose.onClick.AddListener(() => toolMaster.SetActive(false));
 
+        //rotation
+        buttonRotatePlus.onClick.AddListener(() => OnRotatePlus());
+        buttonRotateMinus.onClick.AddListener(() => OnRotateMinus());
 
-        [Header("UI")]
-        [SerializeField] private GameObject toolMaster;
-        [SerializeField] private TMP_Text objectName;
-        [SerializeField] private Button buttonClose;
-        [SerializeField] private Button buttonRotate;
-        [SerializeField] private Button buttonRotatePlus;
-        [SerializeField] private Button buttonRotateMinus;
+        //scale
+        buttonScalePlus.onClick.AddListener(() => OnScalePlus());
+        buttonScaleMinus.onClick.AddListener(() => OnScaleMinus());
 
-        [SerializeField] private Button buttonScale;
-        [SerializeField] private Button buttonScalePlus;
-        [SerializeField] private Button buttonScaleMinus;
+        buttonRotate.onClick.AddListener(() => OnActivateFeature(ActiveFeature.Rotate));
+        buttonScale.onClick.AddListener(() => OnActivateFeature(ActiveFeature.Scale));
+        buttonTranslate.onClick.AddListener(() => OnActivateFeature(ActiveFeature.Translate));
+    }
 
-        [SerializeField] private Button buttonTranslate;
-
-        private void Start()
+    private void Update()
+    {
+        if (_target == null || Input.GetMouseButtonDown(1))
         {
             toolMaster.SetActive(false);
-            buttonClose.onClick.AddListener(() => toolMaster.SetActive(false));
-
-            //rotation
-            buttonRotatePlus.onClick.AddListener(() => OnRotatePlus());
-            buttonRotateMinus.onClick.AddListener(() => OnRotateMinus());
-
-            //scale
-            buttonScalePlus.onClick.AddListener(() => OnScalePlus());
-            buttonScaleMinus.onClick.AddListener(() => OnScaleMinus());
-
-            buttonRotate.onClick.AddListener(() => OnActivateFeature(ActiveFeature.Rotate));
-            buttonScale.onClick.AddListener(() => OnActivateFeature(ActiveFeature.Scale));
-            buttonTranslate.onClick.AddListener(() => OnActivateFeature(ActiveFeature.Translate));
         }
 
-        private void Update()
-        {
-            if (_target == null || Input.GetMouseButtonDown(1))
-            {
-                toolMaster.SetActive(false);
-            }
-
-            if (_isBuild && Input.GetMouseButtonDown(0))
-            {
-                _isBuild = false;
-            }
-
-            if (Input.GetMouseButtonDown(1))
-            {
-                if (_isBuild)
-                {
-                    _isBuild = false;
-                    TranslateCancel();
-                }
-                else if (_buildingBuilder != null)
-                    _buildingBuilder.DeactivateTool();
-            }
-
-        }
-
-        public void SelectedBuilding(IBuilding _b, Vector3 worldPosition)
-        {
-            _building = _b;
-            toolMaster.transform.position = worldPosition += offset;
-            objectName.text = _building.GetName();
-            _target = _building.Root.gameObject;
-
-            // maxScaleBuilding = _b.Info.Size.x;
-            // minScaleBuilding = _b.Info.Size.x / 2;
-
-            _buildingRotation = _target.GetComponent<Building>().Rotation;
-            toolMaster.SetActive(true);
-        }
-
-        /// <summary>
-        /// enable selected feature and disable others
-        /// </summary>
-        /// <param name="_feature">selected feature</param>
-
-        private void OnActivateFeature(ActiveFeature _feature)
-        {
-            bool _isRotate = _feature.Equals(ActiveFeature.Rotate);
-            bool _isScale = _feature.Equals(ActiveFeature.Scale);
-            bool _isTranslate = _feature.Equals(ActiveFeature.Translate);
-
-            buttonRotatePlus.gameObject.SetActive(_isRotate);
-            buttonRotateMinus.gameObject.SetActive(_isRotate);
-
-            buttonScalePlus.gameObject.SetActive(_isScale);
-            buttonScaleMinus.gameObject.SetActive(_isScale);
-
-            if (_feature.Equals(ActiveFeature.Translate))
-            {
-                Building _dBuilding = _target.GetComponent<Building>();
-                _prevBuildLoc.Add(_dBuilding.Point);
-                BuildingBuilder[] bb = FindObjectsOfType<BuildingBuilder>();
-                foreach (var b in bb)
-                {
-                    if (b.BuildingInfo.Equals(_dBuilding.Info))
-                    {
-                        _buildingBuilder = b;
-                        _isBuild = true;
-                        b.ActivateTool();
-                        break;
-                    }
-                }
-                _dBuilding.Terminate();
-            }
-        }
-
-        #region translate
-
-        public void TranslateCancel()
+        if (_isBuild && Input.GetMouseButtonDown(0))
         {
             _isBuild = false;
-            if (_buildingBuilder != null)
+        }
+
+        if (Input.GetMouseButtonDown(1))
+        {
+            if (_isBuild)
             {
-                _buildingBuilder.DeactivateTool();
-                bool isOk = true;
-                foreach (var point in _prevBuildLoc)
-                {
-                    if (!_buildingBuilder.BuildingInfo.CheckBuildingAvailability(point))
-                        isOk = false;
-                }
-                if (isOk)
-                {
-                    _buildingBuilder.build(_prevBuildLoc);
-                    _prevBuildLoc.Clear();
-                    _buildingBuilder = null;
-                }
+                _isBuild = false;
+                TranslateCancel();
             }
+            else if (_buildingBuilder != null)
+                _buildingBuilder.DeactivateTool();
         }
-
-        #endregion
-
-        #region  rotation
-
-        private void OnRotatePlus()
-        {
-            _target.transform.GetChild(0).localRotation = Quaternion.AngleAxis(90, Vector3.up) * _target.transform.GetChild(0).localRotation;
-
-            _buildingRotation.State++;
-            if (_buildingRotation.State > 3) _buildingRotation.State = 0;
-        }
-
-        private void OnRotateMinus()
-        {
-            _target.transform.GetChild(0).localRotation = Quaternion.AngleAxis(-90, Vector3.up) * _target.transform.GetChild(0).localRotation;
-
-            _buildingRotation.State--;
-            if (_buildingRotation.State < 0) _buildingRotation.State = 3;
-        }
-        #endregion
-
-        #region scale
-        private void OnScalePlus()
-        {
-            if (_target.transform.GetChild(0).localScale.x < maxScaleBuilding)
-                _target.transform.GetChild(0).localScale += new Vector3(0.1f, 0.1f, 0.1f);
-        }
-
-        private void OnScaleMinus()
-        {
-            if (_target.transform.GetChild(0).localScale.x > minScaleBuilding)
-                _target.transform.GetChild(0).localScale -= new Vector3(0.1f, 0.1f, 0.1f);
-        }
-
-        #endregion
 
     }
+
+    public void SelectedBuilding(IBuilding _b, Vector3 worldPosition)
+    {
+        _building = _b;
+        toolMaster.transform.position = worldPosition += offset;
+        objectName.text = _building.GetName();
+        _target = _building.Root.gameObject;
+
+        // maxScaleBuilding = _b.Info.Size.x;
+        // minScaleBuilding = _b.Info.Size.x / 2;
+
+        _buildingRotation = _target.GetComponent<Building>().Rotation;
+        toolMaster.SetActive(true);
+    }
+
+    /// <summary>
+    /// enable selected feature and disable others
+    /// </summary>
+    /// <param name="_feature">selected feature</param>
+
+    private void OnActivateFeature(ActiveFeature _feature)
+    {
+        bool _isRotate = _feature.Equals(ActiveFeature.Rotate);
+        bool _isScale = _feature.Equals(ActiveFeature.Scale);
+        bool _isTranslate = _feature.Equals(ActiveFeature.Translate);
+
+        buttonRotatePlus.gameObject.SetActive(_isRotate);
+        buttonRotateMinus.gameObject.SetActive(_isRotate);
+
+        buttonScalePlus.gameObject.SetActive(_isScale);
+        buttonScaleMinus.gameObject.SetActive(_isScale);
+
+        if (_feature.Equals(ActiveFeature.Translate))
+        {
+            Building _dBuilding = _target.GetComponent<Building>();
+            _prevBuildLoc.Add(_dBuilding.Point);
+            BuildingBuilder[] bb = FindObjectsOfType<BuildingBuilder>();
+            foreach (var b in bb)
+            {
+                if (b.BuildingInfo.Equals(_dBuilding.Info))
+                {
+                    _buildingBuilder = b;
+                    _isBuild = true;
+                    b.ActivateTool();
+                    break;
+                }
+            }
+            _dBuilding.Terminate();
+        }
+    }
+
+    #region translate
+
+    public void TranslateCancel()
+    {
+        _isBuild = false;
+        if (_buildingBuilder != null)
+        {
+            _buildingBuilder.DeactivateTool();
+            bool isOk = true;
+            foreach (var point in _prevBuildLoc)
+            {
+                if (!_buildingBuilder.BuildingInfo.CheckBuildingAvailability(point))
+                    isOk = false;
+            }
+            if (isOk)
+            {
+                _buildingBuilder.build(_prevBuildLoc);
+                _prevBuildLoc.Clear();
+                _buildingBuilder = null;
+            }
+        }
+    }
+
+    #endregion
+
+    #region  rotation
+
+    private void OnRotatePlus()
+    {
+        _target.transform.GetChild(0).localRotation = Quaternion.AngleAxis(90, Vector3.up) * _target.transform.GetChild(0).localRotation;
+
+        _buildingRotation.State++;
+        if (_buildingRotation.State > 3) _buildingRotation.State = 0;
+    }
+
+    private void OnRotateMinus()
+    {
+        _target.transform.GetChild(0).localRotation = Quaternion.AngleAxis(-90, Vector3.up) * _target.transform.GetChild(0).localRotation;
+
+        _buildingRotation.State--;
+        if (_buildingRotation.State < 0) _buildingRotation.State = 3;
+    }
+    #endregion
+
+    #region scale
+    private void OnScalePlus()
+    {
+        if (_target.transform.GetChild(0).localScale.x < maxScaleBuilding)
+            _target.transform.GetChild(0).localScale += new Vector3(0.1f, 0.1f, 0.1f);
+    }
+
+    private void OnScaleMinus()
+    {
+        if (_target.transform.GetChild(0).localScale.x > minScaleBuilding)
+            _target.transform.GetChild(0).localScale -= new Vector3(0.1f, 0.1f, 0.1f);
+    }
+
+    #endregion
+
 }
